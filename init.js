@@ -15,7 +15,7 @@ async function init(appDetails) {
 	// Create template config with defaults
 	const config = {
 		libraryName: appDetails.appName,
-		mainJs: './src/main.js',
+		mainJs: './src/main.ts',
 		globals: {
 			apex: 'apex'
 		},
