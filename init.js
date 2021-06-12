@@ -22,6 +22,7 @@ async function init(appDetails) {
 		srcFolder: './src',
 		distFolder: './build',
 		external: ['apex'],
+		cssExtensions: [],
 		version: '1.0.0'
 	};
 
@@ -30,7 +31,6 @@ async function init(appDetails) {
 
 	// Set main answers
 	config.libraryName = answers['library-name'];
-	config.cssExtensions = answers['css-extensions'];
 
 	return config;
 }
@@ -52,19 +52,6 @@ function getTemplateQuestions(appDetails) {
 
 				return 'The library name may only include letters and numbers.';
 			}
-		},
-		{
-			name: 'css-extensions',
-			type: 'list',
-			message: 'CSS processors?',
-			default: ['.css'],
-			choices: [
-				{name: 'CSS', value: ['css']},
-				new inquirer.Separator(),
-				{name: 'Sass', value: ['scss']},
-				{name: 'Less', value: ['less']},
-				{name: 'Stylus', value: ['styl']}
-			]
 		}
 	];
 }
