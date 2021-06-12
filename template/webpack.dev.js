@@ -1,138 +1,30 @@
 const path = require("path");
+const fs = require("fs");
 const apexnitroConfig = require("./apexnitro.config.json");
 const CopyPlugin = require("copy-webpack-plugin");
 
-let styleRule;
+const staticFileDir = path.join(__dirname, 'src', 'static');
+const staticFileCount = fs.readdirSync(staticFileDir).length;
 
-if (apexnitroConfig.cssExtensions.includes('css')) {
-  styleRule = {
-    test: /\.css$/i,
-    use: [
+const plugins = [];
+
+// If there are any static files to transfer, we want to register the the webpack
+// copy plugin.
+if (staticFileCount > 0) {
+  plugins.push(new CopyPlugin({
+    patterns: [
       {
-        loader: "file-loader",
-        options: {
-          name: `${apexnitroConfig.libraryName}.css`
-        }
-      },
-      { loader: "extract-loader" },
-      { loader: "css-loader?-url" },
-      {
-        loader: 'postcss-loader',
-        options: {
-          postcssOptions: {
-            plugins: [
-              [
-                'postcss-preset-env',
-                {},
-              ],
-            ],
-          },
-        },
+        from: path.resolve(apexnitroConfig.srcFolder, "static"),
+        to: path.resolve(apexnitroConfig.distFolder, "")
       }
     ]
-  };
-}
-
-if (apexnitroConfig.cssExtensions.includes('scss')) {
-  styleRule = {
-    test: /\.s[ac]ss$/i,
-    use: [
-      {
-        loader: "file-loader",
-        options: {
-          name: `${apexnitroConfig.libraryName}.css`
-        }
-      },
-      { loader: "extract-loader" },
-      { loader: "css-loader?-url" },
-      {
-        loader: 'postcss-loader',
-        options: {
-          postcssOptions: {
-            plugins: [
-              [
-                'postcss-preset-env',
-                {},
-              ],
-            ],
-          },
-        },
-      },
-      {
-        loader: "sass-loader"
-      }
-    ]
-  };
-}
-
-if (apexnitroConfig.cssExtensions.includes('less')) {
-  styleRule = {
-    test: /\.less$/,
-    use: [
-      {
-        loader: "file-loader",
-        options: {
-          name: `${apexnitroConfig.libraryName}.css`
-        }
-      },
-      { loader: "extract-loader" },
-      { loader: "css-loader?-url" },
-      {
-        loader: 'postcss-loader',
-        options: {
-          postcssOptions: {
-            plugins: [
-              [
-                'postcss-preset-env',
-                {},
-              ],
-            ],
-          },
-        },
-      },
-      {
-        loader: "less-loader"
-      }
-    ]
-  };
-}
-
-if (apexnitroConfig.cssExtensions.includes('styl')) {
-  styleRule = {
-    test: /\.styl$/,
-    use: [
-      {
-        loader: "file-loader",
-        options: {
-          name: `${apexnitroConfig.libraryName}.css`
-        }
-      },
-      { loader: "extract-loader" },
-      { loader: "css-loader?-url" },
-      {
-        loader: 'postcss-loader',
-        options: {
-          postcssOptions: {
-            plugins: [
-              [
-                'postcss-preset-env',
-                {},
-              ],
-            ],
-          },
-        },
-      },
-      {
-        loader: "stylus-loader"
-      }
-    ]
-  };
+  }));
 }
 
 module.exports = {
   mode: "development",
   devtool: "eval-source-map",
-  entry: [apexnitroConfig.mainCss, apexnitroConfig.mainJs],
+  entry: [apexnitroConfig.mainJs],
   output: {
     path: path.resolve(apexnitroConfig.distFolder),
     library: apexnitroConfig.libraryName,
@@ -150,17 +42,12 @@ module.exports = {
           }
         }
       },
-      styleRule
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      }
     ]
   },
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: path.resolve(apexnitroConfig.srcFolder, "static"),
-          to: path.resolve(apexnitroConfig.distFolder, "static")
-        }
-      ]
-    })
-  ]
+  plugins: plugins
 };
