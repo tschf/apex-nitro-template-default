@@ -2,9 +2,22 @@ const path = require("path");
 const fs = require("fs");
 const apexnitroConfig = require("./apexnitro.config.json");
 const CopyPlugin = require("copy-webpack-plugin");
+const noSuchFolderErrorCode = 'ENOENT'
 
 const staticFileDir = path.join(__dirname, 'src', 'static');
-const staticFileCount = fs.readdirSync(staticFileDir).length;
+let staticDirFiles;
+try {
+  staticDirFiles = fs.readdirSync(staticFileDir);
+} catch (e) {
+  if (e.code !== noSuchFolderErrorCode){
+    throw(e);
+  }
+
+  // Because the folder doesn't exist, we know its an empty file listing. Assign
+  // an empty array
+  staticDirFiles = [];
+}
+const staticFileCount = staticDirFiles.length;
 
 const plugins = [];
 
